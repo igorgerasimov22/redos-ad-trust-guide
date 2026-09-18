@@ -1,0 +1,35 @@
+---
+- name: Check whether IPA is already configured
+  ansible.builtin.stat:
+    path: /etc/ipa/default.conf
+  register: ipa_primary_config
+
+- name: Build primary install command
+  ansible.builtin.set_fact:
+    ipa_primary_install_argv: >-
+      {{
+        [
+          'ipa-server-install',
+          '--unattended',
+          '--realm=' + ipa_realm,
+          '--domain=' + ipa_domain,
+          '--hostname=' + ipa_primary_fqdn,
+          '--ds-password=' + ipa_dm_password,
+          '--admin-password=' + ipa_admin_password
+        ]
+        + (['--setup-dns'] if ipa_setup_dns else [])
+        + (['--setup-ca'] if ipa_setup_ca else [])
+        + (ipa_forwarders | map('regex_replace', '^(.*)$', '--forwarder=\\1') | list if ipa_setup_dns else [])
+      }}
+  when: not ipa_primary_config.stat.exists
+  no_log: true
+
+- name: Install primary IPA server
+  ansible.builtin.command:
+    argv: "{{ ipa_primary_install_argv }}"
+  when: not ipa_primary_config.stat.exists
+  no_log: true
+
+- name: Check IPA services
+  ansible.builtin.command: ipactl status
+  changed_when: false
