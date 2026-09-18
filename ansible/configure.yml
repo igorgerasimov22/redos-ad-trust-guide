@@ -1,0 +1,6 @@
+---
+- name: Apply FreeIPA configuration
+  hosts: "{{ ipa_primary_host }}"
+  become: true
+  roles:
+    - ipa_config
