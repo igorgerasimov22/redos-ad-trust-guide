@@ -1,0 +1,54 @@
+---
+ipa_domain: ipa.example
+ipa_realm: IPA.EXAMPLE
+
+ipa_primary_host: ipa01
+ipa_primary_fqdn: ipa01.ipa.example
+ipa_replica_fqdn: ipa02.ipa.example
+
+ipa_setup_dns: true
+ipa_setup_ca: true
+ipa_forwarders:
+  - 192.0.2.53
+
+# Packages can be adjusted for the exact RED OS repository naming.
+ipa_common_packages:
+  - ipa-server
+  - ipa-server-dns
+  - python3-libselinux
+
+# Declarative configuration examples.
+ipa_groups:
+  - name: linux-admins
+    description: Linux administrators
+
+ipa_users: []
+#  - name: testuser
+#    first: Test
+#    last: User
+#    email: testuser@example.com
+#    groups:
+#      - linux-admins
+
+ipa_hbac_rules: []
+#  - name: allow_linux_admins
+#    description: Allow Linux admins to all IPA clients
+#    user_groups:
+#      - linux-admins
+#    hostcat: all
+#    servicecat: all
+
+ipa_sudo_rules: []
+#  - name: linux_admins_all
+#    description: Full sudo for Linux administrators
+#    user_groups:
+#      - linux-admins
+#    hostcat: all
+#    commands:
+#      - ALL
+
+ipa_dns_records: []
+#  - zone: ipa.example
+#    name: app01
+#    type: A
+#    value: 192.0.2.100
