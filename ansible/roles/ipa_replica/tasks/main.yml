@@ -1,0 +1,49 @@
+---
+- name: Check whether replica is already configured
+  ansible.builtin.stat:
+    path: /etc/ipa/default.conf
+  register: ipa_replica_config
+
+- name: Wait for primary IPA API
+  ansible.builtin.wait_for:
+    host: "{{ ipa_primary_fqdn }}"
+    port: 443
+    timeout: 120
+  when: not ipa_replica_config.stat.exists
+
+- name: Enroll replica as IPA client
+  ansible.builtin.command:
+    argv:
+      - ipa-client-install
+      - --unattended
+      - "--domain={{ ipa_domain }}"
+      - "--realm={{ ipa_realm }}"
+      - "--server={{ ipa_primary_fqdn }}"
+      - "--hostname={{ ipa_replica_fqdn }}"
+      - --principal=admin
+      - "--password={{ ipa_admin_password }}"
+      - --mkhomedir
+  when: not ipa_replica_config.stat.exists
+  no_log: true
+
+- name: Promote host to IPA replica
+  ansible.builtin.command:
+    argv: >-
+      {{
+        [
+          'ipa-replica-install',
+          '--unattended',
+          '--server=' + ipa_primary_fqdn,
+          '--principal=admin',
+          '--admin-password=' + ipa_admin_password
+        ]
+        + (['--setup-dns'] if ipa_setup_dns else [])
+        + (['--setup-ca'] if ipa_setup_ca else [])
+        + (ipa_forwarders | map('regex_replace', '^(.*)$', '--forwarder=\\1') | list if ipa_setup_dns else [])
+      }}
+  when: not ipa_replica_config.stat.exists
+  no_log: true
+
+- name: Check IPA services on replica
+  ansible.builtin.command: ipactl status
+  changed_when: false
