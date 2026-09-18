@@ -1,0 +1,4 @@
+---
+ipa_common_packages:
+  - ipa-server
+  - ipa-server-dns
