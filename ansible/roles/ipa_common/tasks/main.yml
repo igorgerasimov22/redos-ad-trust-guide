@@ -1,0 +1,19 @@
+---
+- name: Set FQDN hostname
+  ansible.builtin.hostname:
+    name: "{{ ipa_primary_fqdn if ipa_role == 'primary' else ipa_replica_fqdn }}"
+
+- name: Install IPA packages
+  ansible.builtin.dnf:
+    name: "{{ ipa_common_packages }}"
+    state: present
+
+- name: Ensure chronyd is enabled
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Verify FQDN resolves locally
+  ansible.builtin.command: "getent hosts {{ ipa_primary_fqdn if ipa_role == 'primary' else ipa_replica_fqdn }}"
+  changed_when: false

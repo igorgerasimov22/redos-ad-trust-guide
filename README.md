@@ -40,6 +40,8 @@ HAVE_KADM5SRV_MIT
 - [`docs/SOURCES.md`](docs/SOURCES.md) — официальные источники.
 - [`scripts/precheck-redos.sh`](scripts/precheck-redos.sh) — автоматический предварительный чек IPA-сервера.
 - [`scripts/verify-trust.sh`](scripts/verify-trust.sh) — пост-проверка trust.
+- [`docs/07-ansible-deployment.md`](docs/07-ansible-deployment.md) — деплой двух FreeIPA/IdM серверов через Ansible.
+- [`ansible/`](ansible/) — inventory, роли и playbook'и для установки primary + replica и дальнейшего управления IPA.
 
 ## Обозначения в примерах
 
