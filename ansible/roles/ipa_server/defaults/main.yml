@@ -1,0 +1,4 @@
+---
+ipa_setup_dns: true
+ipa_setup_ca: true
+ipa_forwarders: []
